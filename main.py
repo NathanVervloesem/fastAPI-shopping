@@ -25,6 +25,10 @@ if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
         json.dump([], f)
 
+@app.get('/ping')
+def ping():
+    return {"status":"ok"}
+
 @app.get("/items/")
 def get_items():
     with open(DATA_FILE, "r") as f:
