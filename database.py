@@ -1,0 +1,12 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+# Use SQLite for local dev or PostgreSQL on Render
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# For Postgres, use something like:
+# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost/dbname"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
