@@ -4,7 +4,9 @@ from pydantic import BaseModel
 import json
 import os
 from sqlalchemy.orm import Session
-from . import models, database, crud
+import models
+import database
+import crud
 
 app = FastAPI()
 
@@ -39,13 +41,13 @@ def ping():
 
 @app.get("/items/")
 def get_items(db: Session = Depends(get_db)):
-    db_items = crud.get_all_items(db)
+    db_items = list(crud.get_all_items(db))
     if db_items is None:
         raise HTTPException(status_code=404, detail="Items not found")
     return db_items
 
 @app.post("/items/add")
-def add_item(name: str, store: str, db: Session = Depends(get_db)):
+def add_item_route(name: str, store: str, db: Session = Depends(get_db)):
     return crud.add_item(db, name, store)
 
 @app.post("/items/remove")

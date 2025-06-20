@@ -1,18 +1,18 @@
 from sqlalchemy.orm import Session
-from .models import Item
+from models import Item
 
 def get_item(db: Session, item_id: int):
     return db.query(Item).filter(Item.id == item_id).first()
 
 def get_all_items(db: Session):
-    return db.query(Item)
+    return db.query(Item).all()
 
 def add_item(db: Session, name: str, store: str):
     db_item = Item(name=name, store=store)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
-    return 
+    return db_item
 
 def remove_item(db: Session, name: str, store:str):
     item = db.query(Item).filter(Item.name == name and Item.store == store).first()
