@@ -33,6 +33,9 @@ class Item(ItemCreate):
     class Config:
         orm_mode = True
 
+class Message(BaseModel):
+    detail: str
+
 # Dependency
 def get_db():
     db = database.SessionLocal()
@@ -57,18 +60,19 @@ def get_items(db: Session = Depends(get_db)):
 def add_item_route(item: ItemCreate, db: Session = Depends(get_db)):
     return crud.add_item(db, item.name, item.store)
 
-@app.post("/items/remove", response_model=Item)
+@app.post("/items/remove", response_model=Message)
 def remove_item_route(item: ItemCreate, db: Session = Depends(get_db)):
     success = crud.remove_item(db, item.name, item.store)
     if not success:
         raise HTTPException(status_code=404, detail="Item not found")
-    return {"detail": f"Item {item.name, item.store} deleted"}
+    return {f"detail":"Item deleted"}
 
-@app.post("/items/clear_tab", response_model=Item)
+@app.post("/items/clear_tab", response_model=Message)
 def clear_tab(item: ItemCreate, db: Session = Depends(get_db)):
     success = crud.remove_tab(db, item.store)
     if not success:
         raise HTTPException(status_code=404, detail="Items not found")
+    return {"detail": "Cleared store"}
 
 #TODO make post  for clear tab 
 
