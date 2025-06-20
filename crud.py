@@ -14,6 +14,15 @@ def add_item(db: Session, name: str, store: str):
     db.refresh(db_item)
     return db_item
 
+def replace_item(db: Session, name: str, store: str, new_name: str):
+    item = db.query(Item).filter(Item.name == name and Item.store == store).first()
+    if item:
+        item.name = new_name
+        db.commit()
+        db.refresh(item)
+        return item
+    return None
+
 def remove_item(db: Session, name: str, store:str):
     item = db.query(Item).filter(Item.name == name and Item.store == store).first()
     if item:

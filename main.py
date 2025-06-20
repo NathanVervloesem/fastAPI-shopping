@@ -25,6 +25,11 @@ class ItemCreate(BaseModel):
     name: str
     store: str
 
+class ItemReplace(BaseModel):
+    name: str
+    store: str
+    new_name: str
+
 class Item(ItemCreate):
     id: int
 
@@ -58,6 +63,14 @@ def get_items(db: Session = Depends(get_db)):
 def add_item_route(item: ItemCreate, db: Session = Depends(get_db)):
     return crud.add_item(db, item.name, item.store)
 
+@app.put("/items/replace",response_model=Item)
+def replace_item_route(item: ItemReplace, db: Session = Depends(get_db)):
+     item =  crud.replace_item(db, item.name, item.store, item.new_name)
+     if not item:
+         raise HTTPException(status_code=404, detail="User not found")
+     return item
+
+# TODO - should be 'delete' instead of 'post'
 @app.post("/items/remove", response_model=Message)
 def remove_item_route(item: ItemCreate, db: Session = Depends(get_db)):
     success = crud.remove_item(db, item.name, item.store)
@@ -65,14 +78,13 @@ def remove_item_route(item: ItemCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
     return {f"detail":"Item deleted"}
 
+# TODO - should be 'delete' instead of 'post'
 @app.post("/items/clear_tab", response_model=Message)
 def clear_tab(item: ItemCreate, db: Session = Depends(get_db)):
     success = crud.remove_tab(db, item.store)
     if not success:
         raise HTTPException(status_code=404, detail="Items not found")
     return {"detail": "Cleared store"}
-
-#TODO make post  for clear tab 
 
 #------------------------
 
