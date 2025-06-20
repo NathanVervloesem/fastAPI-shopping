@@ -19,12 +19,19 @@ app.add_middleware(
 )
 
 # Create tables
+#models.Base.metadata.drop_all(bind=database.engine) # to remove the current database due to changed constraints
 models.Base.metadata.create_all(bind=database.engine)
 
 
-# class Item(BaseModel):
-#     name: str
-#     store: str
+class ItemCreate(BaseModel):
+    name: str
+    store: str
+
+class Item(ItemCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 # Dependency
 def get_db():
@@ -46,20 +53,20 @@ def get_items(db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Items not found")
     return db_items
 
-@app.post("/items/add")
-def add_item_route(name: str, store: str, db: Session = Depends(get_db)):
-    return crud.add_item(db, name, store)
+@app.post("/items/add", response_model=Item)
+def add_item_route(item: ItemCreate, db: Session = Depends(get_db)):
+    return crud.add_item(db, item.name, item.store)
 
-@app.post("/items/remove")
-def remove_item_route(name: str, store: str, db: Session = Depends(get_db)):
-    success = crud.remove_item(db, name, store)
+@app.post("/items/remove", response_model=Item)
+def remove_item_route(item: ItemCreate, db: Session = Depends(get_db)):
+    success = crud.remove_item(db, item.name, item.store)
     if not success:
         raise HTTPException(status_code=404, detail="Item not found")
-    return {"detail": f"Item {name, store} deleted"}
+    return {"detail": f"Item {item.name, item.store} deleted"}
 
-@app.post("/items/clear_tab")
-def clear_tab(store: str, db: Session = Depends(get_db)):
-    success = crud.remove_tab(db, store)
+@app.post("/items/clear_tab", response_model=Item)
+def clear_tab(item: ItemCreate, db: Session = Depends(get_db)):
+    success = crud.remove_tab(db, item.store)
     if not success:
         raise HTTPException(status_code=404, detail="Items not found")
 

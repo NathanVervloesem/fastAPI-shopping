@@ -22,7 +22,6 @@ def remove_item(db: Session, name: str, store:str):
         return True     
     return False
 
-#TODO remove tab
 
 def remove_tab(db: Session, store:str):
     items = db.query(Item).filter(Item.store == store)
